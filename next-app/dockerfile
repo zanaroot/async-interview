@@ -1,0 +1,28 @@
+# syntax=docker.io/docker/dockerfile:1
+
+FROM node:22
+
+# Install zsh and enable corepack globally
+RUN apt-get update && apt-get install -y zsh && apt-get clean \
+    && corepack enable
+
+# Create a new user
+RUN groupadd --gid 1234 appuser \
+    && useradd --uid 1234 --gid appuser --shell /bin/zsh --create-home appuser
+
+# Set ownership and permissions
+RUN mkdir /app && chown appuser:appuser /app
+
+# Install oh-my-zsh for appuser
+USER appuser
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true
+
+WORKDIR /app
+
+# Copy and install dependencies
+COPY --chown=appuser:appuser package.json pnpm-lock.yaml* .npmrc* ./
+
+# Copy the rest of the application
+COPY --chown=appuser:appuser . ./
+
+ENV NEXT_TELEMETRY_DISABLED 1

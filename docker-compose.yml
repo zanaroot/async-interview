@@ -1,0 +1,71 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      - 'POSTGRES_USER=root'
+      - 'POSTGRES_PASSWORD=password'
+      - 'POSTGRES_DB=next-app'
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal-network
+
+  minio:
+    container_name: minio
+    image: minio/minio:latest
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: password
+      MINIO_DEFAULT_BUCKETS: mybucket
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_REGION: ${MINIO_REGION}
+    volumes:
+      - ./minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - internal-network
+
+  next-app:
+    container_name: next-app
+    build:
+      context: ./next-app
+      dockerfile: dockerfile
+
+    env_file:
+      - .env
+    volumes:
+      - ./next-app:/app
+      - .env:/app/.env
+    restart: on-failure
+    stdin_open: true
+    tty: true
+    environment:
+      SHELL: /bin/zsh
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+    networks:
+      - external-network
+      - internal-network
+    command: [ "/bin/zsh" ]
+    user: "${UID}:${GID}"
+
+volumes:
+  postgres_data:
+  minio_data:
+  pgadmin-data:
+
+
+networks:
+  external-network:
+    external: true
+  internal-network:
+    driver: bridge
