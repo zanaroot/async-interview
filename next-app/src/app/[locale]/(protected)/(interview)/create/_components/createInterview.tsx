@@ -36,7 +36,15 @@ import { useForm } from '@tanstack/react-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { format } from 'date-fns';
-import { CalendarIcon, Loader2, Plus, Send, Trash2, User } from 'lucide-react';
+import {
+  CalendarIcon,
+  GripVertical,
+  Loader2,
+  Plus,
+  Send,
+  Trash2,
+  User,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -54,8 +62,32 @@ export default function CreateInterview() {
   const [questions, setQuestions] = useState<Question[]>([
     { id: '1', text: '' },
   ]);
+  const [draggedItem, setDraggedItem] = useState<Question | null>(null);
 
   const client = useQueryClient();
+
+  const handleDragStart = (e: React.DragEvent, question: Question) => {
+    setDraggedItem(question);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetQuestion: Question) => {
+    e.preventDefault();
+    if (!draggedItem || draggedItem.id === targetQuestion.id) return;
+
+    const newQuestions = [...questions];
+    const draggedIndex = questions.findIndex((q) => q.id === draggedItem.id);
+    const targetIndex = questions.findIndex((q) => q.id === targetQuestion.id);
+
+    newQuestions.splice(draggedIndex, 1);
+    newQuestions.splice(targetIndex, 0, draggedItem);
+
+    setQuestions(newQuestions);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedItem(null);
+  };
 
   const addQuestion = () => {
     setQuestions([...questions, { id: crypto.randomUUID(), text: '' }]);
@@ -261,7 +293,17 @@ export default function CreateInterview() {
 
             <div className='space-y-4'>
               {questions.map((question, index) => (
-                <div key={question.id} className='flex gap-2'>
+                <div
+                  key={question.id}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, question)}
+                  onDragOver={(e) => handleDragOver(e, question)}
+                  onDragEnd={handleDragEnd}
+                  className='flex gap-2'
+                >
+                  <div className='cursor-move p-3'>
+                    <GripVertical className='h-8 w-4 text-gray-400' />
+                  </div>
                   <div className='flex-1 space-y-2'>
                     <Label htmlFor={question.id} className='sr-only'>
                       {t('question-number', { number: index + 1 })}
@@ -281,7 +323,7 @@ export default function CreateInterview() {
                       variant='outline'
                       size='icon'
                       onClick={() => removeQuestion(question.id)}
-                      className='shrink-0'
+                      className='mt-2 shrink-0'
                     >
                       <Trash2 className='h-4 w-4' />
                     </Button>
