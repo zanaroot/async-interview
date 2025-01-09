@@ -23,8 +23,10 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import { updateCandidateMutation } from '@/actions/candidate/update';
 import { useForm } from '@tanstack/react-form';
+import { useRouter } from 'next/navigation';
 
 export const CandidateDetails = ({ id }: { id: number }) => {
+  const routeur = useRouter()
   const { data, isFetching } = useQuery({
     queryKey: ['candidate', 'details', id],
     queryFn: () => oneCandidateQuery(id),
@@ -38,6 +40,7 @@ export const CandidateDetails = ({ id }: { id: number }) => {
         title: 'Success!',
         description: 'Candidate update is successfully!.',
       });
+      routeur.push('/candidate')
     },
     onError: (error: Error) => {
       toast({
