@@ -68,7 +68,7 @@ export const AppSidebar = ({
             title: t('templates'),
             icon: LayoutTemplate,
             url: '/template',
-            soon: true,
+            soon: false,
           },
         ],
       },
