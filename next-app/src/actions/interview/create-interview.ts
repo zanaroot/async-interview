@@ -17,6 +17,7 @@ export interface CreateInterviewPayload {
   questions: {
     id: string;
     text: string;
+    interviewTemplateId?:string | null;
   }[];
 }
 
@@ -65,6 +66,8 @@ export const createInterviewMutation = async (data: CreateInterviewPayload) => {
       organizationId: organizationId,
       interviewId: interviewData.id,
       order: index + 1,
+      interviewTemplateId:question.interviewTemplateId?question.interviewTemplateId : null,
+
     }));
 
     const questions = await questionModel.create(formattedQuestions);

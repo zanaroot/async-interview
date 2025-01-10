@@ -1,7 +1,8 @@
 import { relations } from 'drizzle-orm';
-import { pgTable } from 'drizzle-orm/pg-core';
+import { foreignKey, pgTable } from 'drizzle-orm/pg-core';
 import { InterviewStatusEnum, QuestionStatusEnum } from './enums';
 import { OrganizationTable } from './organization';
+import { interviewTemplateTable } from './template';
 
 export const QuestionTable = pgTable('question', (t) => ({
   id: t
@@ -18,6 +19,9 @@ export const QuestionTable = pgTable('question', (t) => ({
     .timestamp('created_at', { withTimezone: true })
     .notNull()
     .$defaultFn(() => new Date()),
+  interviewTemplateId: t.varchar('template_id')
+  .references(()=> interviewTemplateTable.id),
+
 }));
 
 export const CandidateTable = pgTable('candidate', (t) => ({
@@ -128,4 +132,8 @@ export const QuestionRelations = relations(QuestionTable, ({ one }) => ({
     fields: [QuestionTable.organizationId],
     references: [OrganizationTable.id],
   }),
+  interviewTemplate:one(interviewTemplateTable,{
+    fields:[QuestionTable.interviewTemplateId],
+    references:[interviewTemplateTable.id]
+  })
 }));
