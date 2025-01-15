@@ -13,3 +13,5 @@ export const QuestionStatusEnum = pgEnum('question_status', [
   'pending',
   'done',
 ]);
+
+export const StatusEnum = pgEnum('status', ['read', 'dismiss']);

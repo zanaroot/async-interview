@@ -1,7 +1,5 @@
 'use client';
 
-import { Bell } from 'lucide-react';
-
 import { LogOut } from 'lucide-react';
 
 import { signoutMutation } from '@/actions/auth/signout';
@@ -21,6 +19,7 @@ import { useMutation } from '@tanstack/react-query';
 import { ChevronsUpDown, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useScopedI18n } from '@/packages/locales/client';
+import { Notification } from './notification';
 
 export const SidebarUser = () => {
   const { data: session } = useSession();
@@ -103,10 +102,7 @@ export const SidebarUser = () => {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem className='cursor-pointer'>
-            <Bell />
-            {t('notification')}
-          </DropdownMenuItem>
+          <Notification />
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
