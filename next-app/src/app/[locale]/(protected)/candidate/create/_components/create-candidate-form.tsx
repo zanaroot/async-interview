@@ -14,7 +14,6 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { useForm } from '@tanstack/react-form';
 import { useMutation } from '@tanstack/react-query';
-import { zodValidator } from '@tanstack/zod-form-adapter';
 import { Briefcase, Loader2, Mail, MapPin, Phone, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useScopedI18n } from '@/packages/locales/client';
@@ -53,7 +52,6 @@ export const CreateCandidateForm = () => {
     onSubmit: (values) => {
       mutate(values.value);
     },
-    validatorAdapter: zodValidator(),
   });
 
   return (

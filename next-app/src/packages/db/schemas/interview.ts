@@ -18,8 +18,6 @@ export const QuestionTable = pgTable('question', (t) => ({
     .timestamp('created_at', { withTimezone: true })
     .notNull()
     .$defaultFn(() => new Date()),
-
-
 }));
 
 export const CandidateTable = pgTable('candidate', (t) => ({
@@ -130,5 +128,4 @@ export const QuestionRelations = relations(QuestionTable, ({ one }) => ({
     fields: [QuestionTable.organizationId],
     references: [OrganizationTable.id],
   }),
-
 }));

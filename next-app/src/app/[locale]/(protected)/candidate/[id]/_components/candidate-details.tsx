@@ -26,7 +26,7 @@ import { useForm } from '@tanstack/react-form';
 import { useRouter } from 'next/navigation';
 
 export const CandidateDetails = ({ id }: { id: number }) => {
-  const routeur = useRouter()
+  const routeur = useRouter();
   const { data, isFetching } = useQuery({
     queryKey: ['candidate', 'details', id],
     queryFn: () => oneCandidateQuery(id),
@@ -40,7 +40,7 @@ export const CandidateDetails = ({ id }: { id: number }) => {
         title: 'Success!',
         description: 'Candidate update is successfully!.',
       });
-      routeur.push('/candidate')
+      routeur.push('/candidate');
     },
     onError: (error: Error) => {
       toast({

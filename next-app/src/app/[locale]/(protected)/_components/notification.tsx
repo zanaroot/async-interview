@@ -1,4 +1,5 @@
-import { Copy } from 'lucide-react';
+'use client';
+import { Loader, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -10,13 +11,71 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
 import { useScopedI18n } from '@/packages/locales/client';
 import { Bell } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getallUserNotificationQuery } from '@/actions/notification/get-all-usernotification';
+import Link from 'next/link';
+import { deleteNotificationMutation } from '@/actions/notification/delete-notification';
+import { toast } from '@/hooks/use-toast';
+import { updateStatusNotificationMutation } from '@/actions/notification/update-status-notification';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const Notification = () => {
+  const client = useQueryClient();
+
   const t = useScopedI18n('side-bar-user');
+
+  const { data, isFetching } = useQuery({
+    queryKey: ['usernotification'],
+    queryFn: () => getallUserNotificationQuery(),
+  });
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationKey: ['deletenotification'],
+    mutationFn: deleteNotificationMutation,
+    onSuccess: () => {
+      toast({
+        title: t('notification'),
+        description: t('notification'),
+      });
+
+      client.invalidateQueries({ queryKey: ['usernotification'] });
+    },
+
+    onError: (error) => {
+      toast({
+        title: t('notification'),
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const { mutateAsync: updateStatus } = useMutation({
+    mutationKey: ['updatestatus'],
+    mutationFn: updateStatusNotificationMutation,
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ['usernotification'] });
+    },
+
+    onError: (error) => {
+      toast({
+        title: t('notification'),
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const deleteNotification = async (idNotification: number) => {
+    return await mutateAsync(idNotification as number);
+  };
+
+  const updateStatusNotification = async (idNotification: number) => {
+    return await updateStatus(idNotification as number);
+  };
 
   return (
     <Dialog>
@@ -28,26 +87,56 @@ export const Notification = () => {
       </DialogTrigger>
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>Share link</DialogTitle>
-          <DialogDescription>
-            Anyone who has this link will be able to view this.
-          </DialogDescription>
+          <DialogTitle>Notifications</DialogTitle>
+          <DialogDescription>Your list of notifications.</DialogDescription>
         </DialogHeader>
         <div className='flex items-center space-x-2'>
           <div className='grid flex-1 gap-2'>
-            <Label htmlFor='link' className='sr-only'>
-              Link
-            </Label>
-            <Input
-              id='link'
-              defaultValue='https://ui.shadcn.com/docs/installation'
-              readOnly
-            />
+            {data?.map((item, key) => {
+              return (
+                <div key={key}>
+                  {item.notification?.values === undefined ? (
+                    ''
+                  ) : (
+                    <div
+                      className={`flex space-x-6 ${item.notification?.status === 'dismiss' ? 'bg-slate-900' : ''}`}
+                    >
+                      <Link
+                        href={`${item.notification?.url as string}`}
+                        target='_blank'
+                      >
+                        {isFetching ? (
+                          <Skeleton />
+                        ) : (
+                          <li
+                            onClick={() =>
+                              updateStatusNotification(
+                                item.notification?.id as number
+                              )
+                            }
+                          >
+                            {' '}
+                            {item.notification?.values}
+                          </li>
+                        )}
+                      </Link>
+
+                      {isPending ? (
+                        <Loader />
+                      ) : (
+                        <Trash2
+                          onClick={() =>
+                            deleteNotification(item.notification?.id as number)
+                          }
+                          color='red'
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-          <Button type='submit' size='sm' className='px-3'>
-            <span className='sr-only'>Copy</span>
-            <Copy />
-          </Button>
         </div>
         <DialogFooter className='sm:justify-start'>
           <DialogClose asChild>

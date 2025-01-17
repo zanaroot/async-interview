@@ -10,6 +10,10 @@ export const getInterviewByToken = async (token: string) => {
         ne(q.status, 'done'),
         gt(q.expiresAt, new Date())
       ),
+
+    with: {
+      organization: true,
+    },
   });
   return result;
 };

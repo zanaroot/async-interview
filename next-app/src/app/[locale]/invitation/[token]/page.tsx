@@ -25,10 +25,10 @@ const InterviewPage = async ({
               <div className='rounded-xl bg-gray-50 p-6 shadow-inner'>
                 {interview?.status !== 'ongoing' && (
                   <div>
-                    <p className='text-center text-2xl py-4  text-gray-700'>
+                    <p className='py-4 text-center text-2xl text-gray-700'>
                       Let&apos;s ensure your device is ready for the interview :
                     </p>
-                    <div className='flex items-center justify-center mb-4'>
+                    <div className='mb-4 flex items-center justify-center'>
                       <Video className='text-red-400' />
                       <p className='px-8 text-black'>and</p>
                       <Mic className='text-red-400' />

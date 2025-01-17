@@ -63,22 +63,28 @@ export const TemplateRelations = relations(templateTable, ({ many }) => ({
 }));
 
 // Relations pour Question
-export const QuestionTemplateRelations = relations(QuestionTableTemplate, ({ many, one }) => ({
-  templates: many(TemplateQuestionTable),
-  organization: one(OrganizationTable, {
-    fields: [QuestionTableTemplate.organizationId],
-    references: [OrganizationTable.id],
-  }),
-}));
+export const QuestionTemplateRelations = relations(
+  QuestionTableTemplate,
+  ({ many, one }) => ({
+    templates: many(TemplateQuestionTable),
+    organization: one(OrganizationTable, {
+      fields: [QuestionTableTemplate.organizationId],
+      references: [OrganizationTable.id],
+    }),
+  })
+);
 
 // Relations pour la table de jointure
-export const TemplateQuestionRelations = relations(TemplateQuestionTable, ({ one }) => ({
-  template: one(templateTable, {
-    fields: [TemplateQuestionTable.templateId],
-    references: [templateTable.id],
-  }),
-  question: one(QuestionTableTemplate, {
-    fields: [TemplateQuestionTable.questionId],
-    references: [QuestionTableTemplate.id],
-  }),
-}));
+export const TemplateQuestionRelations = relations(
+  TemplateQuestionTable,
+  ({ one }) => ({
+    template: one(templateTable, {
+      fields: [TemplateQuestionTable.templateId],
+      references: [templateTable.id],
+    }),
+    question: one(QuestionTableTemplate, {
+      fields: [TemplateQuestionTable.questionId],
+      references: [QuestionTableTemplate.id],
+    }),
+  })
+);

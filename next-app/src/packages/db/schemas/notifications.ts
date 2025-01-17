@@ -7,7 +7,7 @@ import { UserTable } from './auth';
 export const NotificationsTable = pgTable('notification', (t) => ({
   id: t.serial('id').primaryKey(),
   values: varchar('values').notNull(),
-  url: varchar('url'),
+  url: varchar('url').notNull(),
   status: StatusEnum('status').default('dismiss'),
   organizationId: t
     .varchar('organization_id')
@@ -39,14 +39,12 @@ export const UsernotificationRelations = relations(
       references: [NotificationsTable.id],
     }),
 
-    owner: one(UserTable, {
+    user: one(UserTable, {
       fields: [UserNotificationTable.userId],
       references: [UserTable.id],
     }),
   })
 );
-
-
 
 export const NotificationRelations = relations(
   NotificationsTable,
