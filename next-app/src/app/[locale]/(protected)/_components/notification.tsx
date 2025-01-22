@@ -1,12 +1,9 @@
 'use client';
 import { Loader, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -21,6 +18,7 @@ import { deleteNotificationMutation } from '@/actions/notification/delete-notifi
 import { toast } from '@/hooks/use-toast';
 import { updateStatusNotificationMutation } from '@/actions/notification/update-status-notification';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const Notification = () => {
   const client = useQueryClient();
@@ -90,61 +88,110 @@ export const Notification = () => {
           <DialogTitle>Notifications</DialogTitle>
           <DialogDescription>Your list of notifications.</DialogDescription>
         </DialogHeader>
+
         <div className='flex items-center space-x-2'>
           <div className='grid flex-1 gap-2'>
-            {data?.map((item, key) => {
-              return (
-                <div key={key}>
-                  {item.notification?.values === undefined ? (
-                    ''
-                  ) : (
-                    <div
-                      className={`flex space-x-6 ${item.notification?.status === 'dismiss' ? 'bg-slate-900' : ''}`}
-                    >
-                      <Link
-                        href={`${item.notification?.url as string}`}
-                        target='_blank'
-                      >
-                        {isFetching ? (
-                          <Skeleton />
-                        ) : (
-                          <li
-                            onClick={() =>
-                              updateStatusNotification(
-                                item.notification?.id as number
-                              )
-                            }
-                          >
-                            {' '}
-                            {item.notification?.values}
-                          </li>
-                        )}
-                      </Link>
-
-                      {isPending ? (
-                        <Loader />
+            {(data?.length as number) >= 7 ? (
+              <ScrollArea className='h-36'>
+                {data?.map((item, key) => {
+                  return (
+                    <div key={key}>
+                      {item.notification?.values === undefined ? (
+                        ''
                       ) : (
-                        <Trash2
-                          onClick={() =>
-                            deleteNotification(item.notification?.id as number)
-                          }
-                          color='red'
-                        />
+                        <div
+                          className={`flex justify-between space-x-6 pr-2 ${item.notification?.status === 'dismiss' ? 'bg-gray-600' : null}`}
+                        >
+                          <Link
+                            href={`${item.notification?.url as string}`}
+                            target='_blank'
+                          >
+                            {isFetching ? (
+                              <Skeleton />
+                            ) : (
+                              <li
+                                onClick={() =>
+                                  updateStatusNotification(
+                                    item.notification?.id as number
+                                  )
+                                }
+                              >
+                                {' '}
+                                {item.notification?.values}
+                              </li>
+                            )}
+                          </Link>
+
+                          {isPending ? (
+                            <Loader />
+                          ) : (
+                            <Trash2
+                              onClick={() =>
+                                deleteNotification(
+                                  item.notification?.id as number
+                                )
+                              }
+                              color='red'
+                            />
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                  );
+                })}
+              </ScrollArea>
+            ) : (
+              <div>
+                {data?.map((item, key) => {
+                  return (
+                    <div key={key}>
+                      {item.notification?.values === undefined ? (
+                        ''
+                      ) : (
+                        <div
+                          className={`flex justify-between space-x-6 ${item.notification?.status === 'dismiss' ? 'bg-gray-600' : null}`}
+                        >
+                          <Link
+                            href={`${item.notification?.url as string}`}
+                            target='_blank'
+                          >
+                            {isFetching ? (
+                              <Skeleton />
+                            ) : (
+                              <li
+                                onClick={() =>
+                                  updateStatusNotification(
+                                    item.notification?.id as number
+                                  )
+                                }
+                              >
+                                {' '}
+                                {item.notification?.values}
+                              </li>
+                            )}
+                          </Link>
+
+                          {isPending ? (
+                            <Loader />
+                          ) : (
+                            <Trash2
+                              onClick={() =>
+                                deleteNotification(
+                                  item.notification?.id as number
+                                )
+                              }
+                              color='red'
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
-        <DialogFooter className='sm:justify-start'>
-          <DialogClose asChild>
-            <Button type='button' variant='secondary'>
-              Close
-            </Button>
-          </DialogClose>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
